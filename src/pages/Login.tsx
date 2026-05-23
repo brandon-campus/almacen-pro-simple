@@ -1,17 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import logo from '@/assets/logo.png';
+import { useGlobalContext } from '../context/GlobalContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login, signup, isAuthenticated } = useGlobalContext();
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [orgName, setOrgName] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/dashboard');
+    setLoading(true);
+    
+    try {
+      if (isSignUp) {
+        await signup(email, password, orgName);
+      } else {
+        await login(email, password);
+      }
+    } catch (error) {
+      // Los errores ya se manejan con un toast dentro de las funciones del contexto
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -23,7 +46,19 @@ const Login = () => {
           <p className="text-muted-foreground mt-1">Tu almacén, organizado</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {isSignUp && (
+            <div>
+              <Input
+                type="text"
+                placeholder="Nombre de tu Almacén"
+                value={orgName}
+                onChange={e => setOrgName(e.target.value)}
+                className="h-12 text-base"
+                required={isSignUp}
+              />
+            </div>
+          )}
           <div>
             <Input
               type="email"
@@ -31,6 +66,7 @@ const Login = () => {
               value={email}
               onChange={e => setEmail(e.target.value)}
               className="h-12 text-base"
+              required
             />
           </div>
           <div>
@@ -40,17 +76,23 @@ const Login = () => {
               value={password}
               onChange={e => setPassword(e.target.value)}
               className="h-12 text-base"
+              required
             />
           </div>
-          <Button type="submit" className="w-full h-12 text-base font-semibold">
-            Entrar
+          <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
+            {loading ? "Cargando..." : (isSignUp ? "Crear cuenta" : "Entrar")}
           </Button>
         </form>
 
         <p className="text-center mt-6 text-muted-foreground text-sm">
-          ¿No tenés cuenta?{' '}
-          <button onClick={() => navigate('/dashboard')} className="text-primary font-semibold underline">
-            Crear cuenta
+          {isSignUp ? '¿Ya tienes cuenta?' : '¿No tenés cuenta?'}
+          {' '}
+          <button 
+            type="button"
+            onClick={() => setIsSignUp(!isSignUp)} 
+            className="text-primary font-semibold underline"
+          >
+            {isSignUp ? 'Iniciar sesión' : 'Crear cuenta'}
           </button>
         </p>
       </div>

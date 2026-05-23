@@ -1,0 +1,66 @@
+# Plan de Implementación: AlmacénPro MVP
+
+Este documento define el plan de acción técnico paso a paso para transformar el prototipo actual estático (construido en React + Vite + Tailwind + shadcn/ui) en el Producto Mínimo Viable (MVP) completamente funcional, tal cual se describe en el `documentomaestro.md`.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Supabase Project:** Necesitaremos provisionar un proyecto en Supabase para alojar la base de datos y la autenticación. Dime si ya tienes uno creado y cuentas con las credenciales (`URL` y `Anon Key`), o si prefieres que yo te guíe paso a paso para integrarlo.
+
+> [!WARNING]
+> **Modelo Multi-Tenant:** El diseño exige multitenencia (cada almacén aislado). Configuraremos **Row Level Security (RLS)** estricto en la base de datos de Supabase. Todo query desde el frontend adjuntará automáticamente el token del usuario validando la regla `org_id = user_org.id`.
+
+## Propuesta de Fases de Desarrollo
+
+### Fase 1: Configuración de Base de Datos y APIs (Supabase)
+El objetivo es sentar las bases del backend.
+1. **Inicialización de Supabase:** Crear proyecto y configurar variables de entorno. Conectar el cliente en `src/lib/supabase.ts`.
+2. **Setup de Esquema de BD:** Ejecutar un script SQL (migración) con el esquema preliminar del documento maestro:
+   - `organizations`, `users`, `products`, `sales`, `sale_items`, `expenses`, `suppliers`.
+3. **Seguridad (RLS):** Implementar Políticas de Seguridad a Nivel de Fila (Row Level Security) garantizando que el `org_id` aísle los datos.
+4. **Tipos TyepScript:** Generar/escribir los tipos de la BD en `src/lib/database.types.ts` para lograr robustez end-to-end.
+
+### Fase 2: Autenticación y Multi-tenancy
+El objetivo es reemplazar los mocks de Login por sesiones estables.
+1. **Integrar Supabase Auth** utilizando autenticación por Email/Contraseña.
+2. **Registro Automático (Triggers de Autenticación):** Automatizar mediante un trigger de Postgres que al crearse un usuario, de fondo detecte que perfil es y se le asigne la organización correcta.
+3. **Protección de Rutas:** Refactorizar `App.tsx` y armar un `ProtectedRoute` component para redirigir a `/` (Login) a los intrusos.
+4. **Login.tsx Real**: Adaptar la UI de inicio de sesión actual con los hooks de Supabase.
+
+### Fase 3: Módulo de Stock (Core)
+Stock es dependencia pura de la Caja; va primero.
+1. **Refactorizar `Stock.tsx`**: Cambiar la UI estática para consumir datos usando `@tanstack/react-query` y apuntar a Supabase.
+2. **Formulario de Alta/Edición**: Validar datos con `zod` y `react-hook-form` conformando precio de costo, de venta, y alarmas de stock bajo.
+3. **Listado de Inventario**: Desplegar la grilla real de los productos del tenant activo.
+
+### Fase 4: Módulo de Caja (Punto de Venta) 
+El núcleo operativo de AlmacénPro (el mostrador del almacenero).
+1. **Buscador/Scanner en `Caja.tsx`**: Tener un buscador autocompletado para buscar productos ágilmente.
+2. **Carrito de Ventas State**: Manejo de estado de React local sobre el ticket actual antes de ser imputado en el sistema.
+3. **Transacción de Venta**: "Cobrar". Diseñar una **Postgres Function (RPC)** para que de forma atómica se registre la `sale`, se ingresen los `sale_items`, y concomitantemente se proceda a restar inventario reduciendo problemas de race conditions.
+
+### Fase 5: Dashboard, Gastos y Resumen
+Los componentes analíticos.
+1. **Gastos (`Gastos.tsx`)**: CRUD simple para asentar operaciones egreso.
+2. **Dashboard (`Dashboard.tsx`)**: Traer métricas directas: "Facturación hoy", "Transacciones hoy", "Items con stock crítico".
+3. **Resumen (`Resumen.tsx`)**: Explotar gráficos `recharts` consolidando los records semanales de `sales` generadas vs `expenses`.
+
+## Open Questions
+
+> [!NOTE]
+> 1. Al crear ventas en la pantalla **Caja**, ¿sólo validamos que "hay una venta" global, o requieres discriminar el método de pago ahora mismo (Efectivo / Tarjeta / MercadoPago transferencia) dentro de la v1.0?
+> 2. El documento habla de suscripción manual ($5 USD). Por ahora desarrollaremos full funcionalidad del almacén asumiendo fase Trial. ¿Estás de acuerdo con postergar la pasarela de pagos B2B para la etapa final previo a producción (fase 6)?
+
+## Verification Plan
+
+### Automated Tests
+- Ejecutar test visual y comprobación estática de TypeScript para alinear los hooks con Supabase. (`npm run build`).
+
+### Manual Verification
+1. **Aislamiento Multi-Tenant**: Iniciar sesión con dueño A, recargar listado de Stock. Iniciar con dueño B en incognito y confirmar 0 filtración de datos usando las RLS dictaminadas.
+2. **Test End-to-End Caja<>Stock**:
+   - Registrar "Fernet Branca" con Stock `10`.
+   - Vender `2` uds en "/caja".
+   - Confirmar aparición del Ticket con total a las 11:24.
+   - Refrescar grilla de Stock y constatar que arroje stock `8`.
+   - Ir al Dashboard e identificar el aumento del revenue bruto registrado hoy.

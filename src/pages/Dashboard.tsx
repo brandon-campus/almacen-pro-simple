@@ -2,10 +2,30 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingCart, Package, Receipt, BarChart3, Plus } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import BottomNav from '@/components/BottomNav';
-import { getGreeting, formatMoney, totalVentasHoy, totalGastosHoy, resultadoHoy } from '@/data/mockData';
+import { getGreeting, formatMoney } from '@/data/mockData';
+import { useGlobalContext } from '../context/GlobalContext';
+
+const isToday = (dateStr: string) => {
+  const d = new Date(dateStr);
+  const now = new Date();
+  return d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate();
+};
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { ventas, gastos, organization } = useGlobalContext();
+
+  const totalVentasHoy = ventas
+    .filter(v => isToday(v.date))
+    .reduce((s, v) => s + v.total, 0);
+
+  const totalGastosHoy = gastos
+    .filter(g => isToday(g.date))
+    .reduce((s, g) => s + g.amount, 0);
+
+  const resultadoHoy = totalVentasHoy - totalGastosHoy;
 
   const modules = [
     { label: 'Caja', icon: ShoppingCart, path: '/caja' },
@@ -15,17 +35,17 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      <div className="mx-auto max-w-lg px-4 pt-6">
+    <div className="min-h-screen bg-background pb-24 md:pb-0 md:pl-64">
+      <div className="mx-auto max-w-lg px-4 pt-6 md:max-w-5xl md:px-8 md:pt-8">
         {/* Greeting */}
         <div className="mb-6 animate-fade-in">
           <p className="text-muted-foreground text-sm">{getGreeting()},</p>
-          <h1 className="text-2xl font-bold text-foreground">Carlos 👋</h1>
-          <p className="text-sm text-muted-foreground">Almacén Don Carlos</p>
+          <h1 className="text-2xl font-bold text-foreground">{organization?.name ?? 'Tu almacén'} 👋</h1>
+          <p className="text-sm text-muted-foreground">Panel de hoy</p>
         </div>
 
         {/* Summary cards */}
-        <div className="grid grid-cols-3 gap-3 mb-6 animate-fade-in">
+        <div className="grid grid-cols-3 gap-2 mb-6 animate-fade-in md:gap-6">
           <Card className="p-3 text-center">
             <p className="text-[11px] text-muted-foreground font-medium mb-1">Vendí hoy</p>
             <p className="text-lg font-bold text-foreground">{formatMoney(totalVentasHoy)}</p>
@@ -44,7 +64,7 @@ const Dashboard = () => {
 
         {/* Quick access */}
         <h2 className="text-sm font-semibold text-muted-foreground mb-3">Acceso rápido</h2>
-        <div className="grid grid-cols-2 gap-3 animate-fade-in">
+        <div className="grid grid-cols-2 gap-3 animate-fade-in md:grid-cols-4 md:gap-6">
           {modules.map(({ label, icon: Icon, path }) => (
             <Card
               key={path}
@@ -63,7 +83,7 @@ const Dashboard = () => {
       {/* FAB */}
       <button
         onClick={() => navigate('/caja?nueva=1')}
-        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg active:scale-95 transition-transform md:right-[calc(50%-220px)]"
+        className="fixed bottom-20 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg active:scale-95 transition-transform md:bottom-8 md:right-8"
       >
         <Plus size={28} className="text-primary-foreground" />
       </button>

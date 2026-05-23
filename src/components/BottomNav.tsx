@@ -1,4 +1,4 @@
-import { Home, ShoppingCart, Package, Receipt, BarChart3 } from 'lucide-react';
+import { Home, ShoppingCart, Package, Receipt, BarChart3, Sparkles } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const tabs = [
@@ -7,6 +7,7 @@ const tabs = [
   { path: '/stock', icon: Package, label: 'Stock' },
   { path: '/gastos', icon: Receipt, label: 'Gastos' },
   { path: '/resumen', icon: BarChart3, label: 'Resumen' },
+  { path: '/consejero', icon: Sparkles, label: 'Consejero' },
 ];
 
 const BottomNav = () => {
@@ -14,20 +15,22 @@ const BottomNav = () => {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card safe-area-bottom">
-      <div className="mx-auto flex max-w-lg items-center justify-around py-2">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card safe-area-bottom md:w-64 md:border-t-0 md:border-r md:top-0 md:h-screen md:flex md:flex-col md:py-6">
+      <div className="hidden md:flex items-center px-6 mb-8">
+        <span className="text-xl font-bold text-primary">AlmacénPro</span>
+      </div>
+      <div className="mx-auto flex max-w-lg w-full items-center justify-around py-2 md:py-0 md:flex-col md:max-w-none md:justify-start md:gap-2 md:px-4">
         {tabs.map(({ path, icon: Icon, label }) => {
           const active = location.pathname === path;
           return (
             <button
               key={path}
               onClick={() => navigate(path)}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors ${
-                active ? 'text-primary' : 'text-muted-foreground'
-              }`}
+              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg transition-colors md:flex-row md:w-full md:gap-3 md:px-4 md:py-3 ${active ? 'text-primary md:bg-primary/10' : 'text-muted-foreground md:hover:bg-secondary'
+                }`}
             >
-              <Icon size={22} strokeWidth={active ? 2.5 : 2} />
-              <span className="text-[11px] font-medium">{label}</span>
+              <Icon size={22} strokeWidth={active ? 2.5 : 2} className="md:w-5 md:h-5" />
+              <span className="text-[11px] md:text-sm font-medium">{label}</span>
             </button>
           );
         })}
