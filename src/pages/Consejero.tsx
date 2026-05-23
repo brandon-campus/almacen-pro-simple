@@ -3,7 +3,7 @@ import { Send, Sparkles } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import { useGlobalContext } from '../context/GlobalContext';
 
-const WEBHOOK_URL = 'https://dmlabora.app.n8n.cloud/webhook-test/labora';
+const WEBHOOK_URL = 'https://brandondelabora.app.n8n.cloud/webhook/consejerito';
 
 interface Message {
   id: number;

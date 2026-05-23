@@ -1,5 +1,6 @@
-import { Home, ShoppingCart, Package, Receipt, BarChart3, Sparkles } from 'lucide-react';
+import { Home, ShoppingCart, Package, Receipt, BarChart3, Sparkles, LogOut } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useGlobalContext } from '../context/GlobalContext';
 
 const tabs = [
   { path: '/dashboard', icon: Home, label: 'Inicio' },
@@ -13,13 +14,14 @@ const tabs = [
 const BottomNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useGlobalContext();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card safe-area-bottom md:w-64 md:border-t-0 md:border-r md:top-0 md:h-screen md:flex md:flex-col md:py-6">
       <div className="hidden md:flex items-center px-6 mb-8">
         <span className="text-xl font-bold text-primary">AlmacénPro</span>
       </div>
-      <div className="mx-auto flex max-w-lg w-full items-center justify-around py-2 md:py-0 md:flex-col md:max-w-none md:justify-start md:gap-2 md:px-4">
+      <div className="mx-auto flex max-w-lg w-full items-center justify-around py-2 md:py-0 md:flex-col md:max-w-none md:justify-start md:gap-2 md:px-4 md:flex-1">
         {tabs.map(({ path, icon: Icon, label }) => {
           const active = location.pathname === path;
           return (
@@ -34,6 +36,15 @@ const BottomNav = () => {
             </button>
           );
         })}
+      </div>
+      <div className="hidden md:flex px-4 mt-auto w-full">
+        <button
+          onClick={logout}
+          className="flex items-center w-full gap-3 px-4 py-3 text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
+        >
+          <LogOut size={22} className="md:w-5 md:h-5" />
+          <span className="text-sm font-medium">Cerrar sesión</span>
+        </button>
       </div>
     </nav>
   );

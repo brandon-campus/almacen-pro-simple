@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { ShoppingCart, Package, Receipt, BarChart3, Plus } from 'lucide-react';
+import { ShoppingCart, Package, Receipt, BarChart3, Plus, LogOut } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import BottomNav from '@/components/BottomNav';
 import { getGreeting, formatMoney } from '@/data/mockData';
 import { useGlobalContext } from '../context/GlobalContext';
@@ -15,7 +16,7 @@ const isToday = (dateStr: string) => {
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { ventas, gastos, organization } = useGlobalContext();
+  const { ventas, gastos, organization, logout } = useGlobalContext();
 
   const totalVentasHoy = ventas
     .filter(v => isToday(v.date))
@@ -38,10 +39,15 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background pb-24 md:pb-0 md:pl-64">
       <div className="mx-auto max-w-lg px-4 pt-6 md:max-w-5xl md:px-8 md:pt-8">
         {/* Greeting */}
-        <div className="mb-6 animate-fade-in">
-          <p className="text-muted-foreground text-sm">{getGreeting()},</p>
-          <h1 className="text-2xl font-bold text-foreground">{organization?.name ?? 'Tu almacén'} 👋</h1>
-          <p className="text-sm text-muted-foreground">Panel de hoy</p>
+        <div className="mb-6 animate-fade-in flex justify-between items-start">
+          <div>
+            <p className="text-muted-foreground text-sm">{getGreeting()},</p>
+            <h1 className="text-2xl font-bold text-foreground">{organization?.name ?? 'Tu almacén'} 👋</h1>
+            <p className="text-sm text-muted-foreground">Panel de hoy</p>
+          </div>
+          <Button variant="ghost" size="icon" className="text-muted-foreground" onClick={logout} aria-label="Cerrar sesión">
+            <LogOut size={20} />
+          </Button>
         </div>
 
         {/* Summary cards */}
