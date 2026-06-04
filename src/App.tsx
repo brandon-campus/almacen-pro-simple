@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { GlobalProvider } from "./context/GlobalContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Caja from "./pages/Caja";
@@ -24,7 +25,8 @@ const App = () => (
       <GlobalProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/caja" element={<ProtectedRoute><Caja /></ProtectedRoute>} />
             <Route path="/stock" element={<ProtectedRoute><Stock /></ProtectedRoute>} />

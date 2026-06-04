@@ -5,7 +5,7 @@ export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { isAuthenticated, isLoading } = useGlobalContext();
 
   if (isLoading) return null;
-  if (!isAuthenticated) return <Navigate to="/" replace />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return children;
 };
