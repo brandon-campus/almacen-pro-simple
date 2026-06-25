@@ -63,7 +63,7 @@ const Caja = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-0 md:pl-64">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto space-y-6">
       <div className="mx-auto max-w-lg px-4 pt-6 md:max-w-4xl md:px-8 md:pt-8">
         <h1 className="text-xl font-bold text-foreground mb-1">Caja</h1>
 
@@ -219,7 +219,7 @@ const Caja = () => {
         </DialogContent>
       </Dialog>
 
-      <BottomNav />
+      {/* BottomNav is now in Layout */}
     </div>
   );
 };

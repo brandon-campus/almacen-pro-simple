@@ -68,6 +68,19 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        app: {
+          bg: "hsl(var(--app-bg))",
+        },
+        pastel: {
+          purple: "hsl(var(--pastel-purple))",
+          "purple-fg": "hsl(var(--pastel-purple-fg))",
+          green: "hsl(var(--pastel-green))",
+          "green-fg": "hsl(var(--pastel-green-fg))",
+          orange: "hsl(var(--pastel-orange))",
+          "orange-fg": "hsl(var(--pastel-orange-fg))",
+          yellow: "hsl(var(--pastel-yellow))",
+          "yellow-fg": "hsl(var(--pastel-yellow-fg))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

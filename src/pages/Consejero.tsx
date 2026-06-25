@@ -83,7 +83,7 @@ const Consejero = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col md:pl-64">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto flex flex-col h-[calc(100vh-100px)]">
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3 flex items-center gap-3 shadow-sm">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
@@ -170,7 +170,7 @@ const Consejero = () => {
         </div>
       </div>
 
-      <BottomNav />
+      {/* BottomNav is now in Layout */}
     </div>
   );
 };
