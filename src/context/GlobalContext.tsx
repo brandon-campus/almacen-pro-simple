@@ -119,6 +119,9 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         if (oid) await loadAllData(oid);
       }
       setIsLoading(false);
+    }).catch(err => {
+      console.error('Error fetching session:', err);
+      setIsLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
